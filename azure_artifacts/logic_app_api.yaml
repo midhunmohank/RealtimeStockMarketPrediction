@@ -1,0 +1,57 @@
+swagger: '2.0'
+info:
+  title: Alpha Vantage API
+  description: This connects to Alpha Vantage API
+  version: '1.0'
+host: www.alphavantage.co
+basePath: /query
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /query:
+    get:
+      summary: Get stock prices
+      parameters:
+        - name: function
+          in: query
+          description: The type of time series data to return (e.g. TIME_SERIES_DAILY_ADJUSTED)
+          required: false
+          type: string
+          default: TIME_SERIES_DAILY_ADJUSTED
+        - name: symbol
+          in: query
+          description: The stock symbol to return data for (e.g. MSFT)
+          required: true
+          type: string
+        - name: apikey
+          in: query
+          description: Your Alpha Vantage API key
+          required: false
+          type: string
+          default: OQLLSP66PGYDG45E
+        - name: outputsize
+          in: query
+          description: The amount of historical data to return (e.g. full)
+          required: false
+          type: string
+          default: compact
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+definitions: {}
+parameters: {}
+responses: {}
+securityDefinitions:
+  apikey:
+    type: apiKey
+    in: query
+    name: apikey
+security:
+  - apikey: []
+tags: []
