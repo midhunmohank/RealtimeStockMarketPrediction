@@ -1,98 +1,31 @@
-name: Build and deploy Python app to Azure Web App - realtimestockprediction
+name: Deploy to Azure Web App
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python version
-        uses: actions/setup-python@v1
-        with:
-          python-version: '3.10'
-
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-      
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-      
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v2
-        with:
-          name: python-app
-          path: |
-            . 
-            !venv/
-            
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: python-app
-          path: .
-          
-      - name: Build Docker image
-        run: docker build -t realtimestockprediction .
-
-      - name: Login to Azure Container Registry
-        uses: azure/docker-login@v1
-        with:
-          login-server: myregistry.azurecr.io
-          username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
-          password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
-
-      - name: Push Docker image to Azure Container Registry
-        run: docker push myregistry.azurecr.io/realtimestockprediction
-
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
-        id: deploy-to-webapp
-        with:
-          app-name: 'realtimestockprediction'
-          slot-name: 'Production'
-          images: 'myregistry.azurecr.io/realtimestockprediction'
-          multi-container-config-file: |
-            {
-              "version": "1.0",
-              "content": {
-                "services": {
-                  "web": {
-                    "image": "myregistry.azurecr.io/realtimestockprediction",
-                    "ports": [
-                      {
-                        "protocol": "tcp",
-                        "port": 80
-                      }
-                    ],
-                    "resources": {
-                      "requests": {
-                        "cpu": "1",
-                        "memoryInGB": "1.5"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          username: ${{ secrets.AZURE_WEBAPP_USERNAME }}
-          password: ${{ secrets.AZURE_WEBAPP_PASSWORD }}
-          docker-run-options: '--name realtimestockprediction -p 80:80'
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Pull Docker image from Docker Hub
+      run: docker pull midhunmohank/stockmarketprediction
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Push Docker image to Azure Container Registry
+      run: |
+        az acr login --name myregistry
+        docker tag <your-docker-hub-username>/<your-docker-image-name>:<tag> myregistry.azurecr.io/myapp
+        docker push myregistry.azurecr.io/myapp
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: myapp
+        images: myregistry.azurecr.io/myapp
+        username: ${{ secrets.AZURE_USERNAME }}
+        password: ${{ secrets.AZURE_PASSWORD }}
