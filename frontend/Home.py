@@ -3,7 +3,6 @@ import pandas as pd
 import yfinance as yf
 import plotly.express as px
 
-st.set_theme("light")
 
 def app():
     # Create a selectbox for the user to choose a stock
