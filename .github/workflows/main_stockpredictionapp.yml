@@ -31,7 +31,7 @@ jobs:
       with:
         push: true
         tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_1010b85f23a84bf2bbc56692ec9b3ec8 }}/midhunmohank/stockmarketprediction:${{ github.sha }}
-        file: frontend/Dockerfile
+        file: ./frontend/Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
