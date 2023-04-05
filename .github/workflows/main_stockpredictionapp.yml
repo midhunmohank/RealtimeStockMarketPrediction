@@ -27,8 +27,9 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        context: ./frontend
         tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_d33edcf0939f4649a52601690cdcc9c8 }}/midhunmohank/stockmarketprediction:${{ github.sha }}
+        context: ./frontend
+        
 
   deploy:
     runs-on: ubuntu-latest
