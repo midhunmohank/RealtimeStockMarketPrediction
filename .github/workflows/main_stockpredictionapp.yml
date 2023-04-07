@@ -23,15 +23,16 @@ jobs:
       uses: docker/login-action@v1
       with:
         registry: https://index.docker.io/v1/
-        username: ${{ secrets.AzureAppService_ContainerUsername_1010b85f23a84bf2bbc56692ec9b3ec8 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_f2c524f685b24d389657b93737ae4a84 }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_1010b85f23a84bf2bbc56692ec9b3ec8 }}/midhunmohank/stockmarketprediction:${{ github.sha }}
+        context: frontend/
         file: frontend/Dockerfile
+        tags: index.docker.io/${{ secrets.DOCKER_USERNAME }}/stockmarketprediction:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -47,5 +48,5 @@ jobs:
       with:
         app-name: 'stockpredictionapp'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_de23e98dd3bd4942b82330e2df409e9e }}
-        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_1010b85f23a84bf2bbc56692ec9b3ec8 }}/midhunmohank/stockmarketprediction:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_7ff7352eb9a84803820dab4763948e35 }}
+        images: 'index.docker.io/${{ secrets.DOCKER_USERNAME }}/stockmarketprediction:${{ github.sha }}'
