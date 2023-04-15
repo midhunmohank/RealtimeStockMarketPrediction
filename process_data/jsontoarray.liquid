@@ -1,0 +1,13 @@
+{% assign data = json_data | parse_json %}
+
+{% assign array = "" | split: "" %}
+
+{% for item in data %}
+  {% assign subarray = "" | split: "" %}
+  {% for subitem in item %}
+    {% assign subarray = subarray | push: subitem %}
+  {% endfor %}
+  {% assign array = array | push: subarray %}
+{% endfor %}
+
+{{ array }}
